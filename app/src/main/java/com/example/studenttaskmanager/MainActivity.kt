@@ -43,6 +43,10 @@ fun LoginScreen() {
         mutableStateOf("")
     }
 
+    var loggedIn by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,6 +100,7 @@ fun LoginScreen() {
 
                                 if (response.isSuccessful) {
                                     students = response.body() ?: emptyList()
+                                    loggedIn = true
                                 } else {
                                     errorMessage = "Failed to load data"
                                 }
@@ -115,6 +120,7 @@ fun LoginScreen() {
 
                     errorMessage = "Invalid Username or Password"
                     students = emptyList()
+                    loggedIn = false
                 }
             }
         ) {
@@ -130,8 +136,15 @@ fun LoginScreen() {
         if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
 
+            Text(text = errorMessage)
+        }
+
+        if (loggedIn) {
+            Spacer(modifier = Modifier.height(10.dp))
+
             Text(
-                text = errorMessage
+                text = "Welcome Admin",
+                fontSize = 20.sp
             )
         }
 
