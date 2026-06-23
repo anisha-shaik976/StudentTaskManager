@@ -11,6 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,16 +27,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun LoginScreen() {
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var students by remember { mutableStateOf(listOf<User>()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
             text = "Student Login",
@@ -59,14 +65,33 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(onClick = { }) {
-            Text("Login")
+        Button(
+            onClick = {
+                RetrofitClient.apiService.getUsers()
+                    .enqueue(object : Callback<List<User>> {
+
+                        override fun onResponse(
+                            call: Call<List<User>>,
+                            response: Response<List<User>>
+                        ) {
+                            students = response.body() ?: emptyList()
+                        }
+
+                        override fun onFailure(
+                            call: Call<List<User>>,
+                            t: Throwable
+                        ) {
+                        }
+                    })
+            }
+        ) {
+            Text("Load Students")
         }
+
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = "Welcome to Student Task Manager",
-            fontSize = 16.sp
-        )
+        students.forEach {
+            Text(text = it.name)
+        }
     }
 }
